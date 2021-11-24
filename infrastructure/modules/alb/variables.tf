@@ -29,7 +29,7 @@ variable "CREATE_TARGET_GROUP" {
 
 variable "SUBNETS" {
   description = "subnets id for ALB"
-  type        = list
+  type        = list(any)
   default     = []
 }
 

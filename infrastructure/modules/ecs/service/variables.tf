@@ -45,3 +45,39 @@ variable "CONTAINER_PORT" {
   description = "the port that the container will listen request"
   type        = string
 }
+
+
+variable "CLUSTER_NAME" {
+  description = "ecs cluster name "
+  type        = string
+}
+
+variable "MAX_NUMBER_TASKS" {
+  description = "max number of task for the ecs service"
+  type        = number
+  default     = 1
+}
+
+variable "MIN_NUMBER_TASKS" {
+  description = "min number of task for the ecs service"
+  type        = number
+  default     = 1
+}
+
+variable "CPU_THRESHOLD" {
+  description = "cpu limit to start to scale new tasks"
+  type        = number
+  default     = 50
+}
+
+variable "MEMORY_THRESHOLD" {
+  description = "memory limit to start to scale new tasks"
+  type        = number
+  default     = 50
+}
+
+variable "ENABLE_AUTOSCALING" {
+  description = "enable or disable autoscaling"
+  type        = bool
+  default     = false
+}

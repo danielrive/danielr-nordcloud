@@ -199,6 +199,12 @@ module "ecs_service" {
   ARN_TASK_DEFINITION = module.task_definition.ARN_TASK_DEFINITION
   SUBNET_ID           = module.vpc_creation.main.private_subnets
   CONTAINER_PORT      = 2368
+  CLUSTER_NAME        = aws_ecs_cluster.cluster.name
+  MAX_NUMBER_TASKS    = 10
+  MIN_NUMBER_TASKS    = 1
+  CPU_THRESHOLD       = 50
+  MEMORY_THRESHOLD    = 50
+  ENABLE_AUTOSCALING  = true
 }
 
 

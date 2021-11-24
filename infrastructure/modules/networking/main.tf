@@ -14,6 +14,6 @@ module "vpc" {
   single_nat_gateway                     = var.SINGLE_NAT_GATEWAY
   one_nat_gateway_per_az                 = var.ONE_NAT_GATEWAY_PER_AZ
   tags                                   = var.TAGS
-  enable_dns_hostnames = true
-  enable_dns_support  = true
+  enable_dns_hostnames                   = true
+  enable_dns_support                     = true
 }
