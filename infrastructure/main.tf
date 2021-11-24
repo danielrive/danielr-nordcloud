@@ -8,15 +8,16 @@ data "aws_caller_identity" "ID_CURRENT_ACCOUNT" {}
 
 ## variables to put in secret manager
 locals {
-  rds_endpoint = split(":", module.db_ghost.db_instance_endpoint)
   db_credentials = {
     database__client               = "mysql"
-    database__connection__host     = rds_endpoint[0]
+    database__connection__host     = element(split(":", module.db_ghost.db_instance_endpoint), 0)
     database__connection__user     = "admin"
     database__connection__password = random_string.pass_db.result
     database__connection__database = "ghostdb"
-    url                            = module.alb.DNS_ALB
-
+    url                            = "http:${module.alb.DNS_ALB}"
+    storage__active                = "s3"
+    storage__s3__region            = var.region
+    storage__s3__bucket            = "ghost-content-${var.env}"
   }
 }
 
@@ -256,4 +257,17 @@ module "db_ghost" {
   subnet_ids             = module.vpc_creation.main.database_subnets
   vpc_security_group_ids = [aws_security_group.sg_ecs_rds.id]
   skip_final_snapshot    = true
+}
+
+###################
+### S3 bucket
+
+module "s3-content" {
+  source              = "terraform-aws-modules/s3-bucket/aws"
+  version             = "2.11.1"
+  bucket              = "ghost-content-${var.env}"
+  block_public_policy = true
+  block_public_acls   = true
+  force_destroy       = true
+  restrict_public_buckets = true
 }

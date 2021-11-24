@@ -18,6 +18,16 @@ data "aws_iam_policy_document" "ecs_role_policy" {
     ]
     resources = [module.kms_secret_manager.ARN_KMS]
   }
+  statement {
+    sid    = "AllowS3Actions"
+    effect = "Allow"
+    actions = [
+      "s3:get*",
+      "s3:put*"
+    ]
+    resources = [module.s3-content.s3_bucket_arn]
+  }
+
 }
 
 ###  KMS Policy 
@@ -50,6 +60,8 @@ data "aws_iam_policy_document" "kms_policy" {
   }
 }
 
+
+### Secret Manager Policy
 data "aws_iam_policy_document" "secret_manager_policy" {
   statement {
     sid    = "AllowUseSecrerManager"
