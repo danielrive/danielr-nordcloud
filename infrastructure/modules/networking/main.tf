@@ -1,0 +1,19 @@
+module "vpc" {
+  source                                 = "terraform-aws-modules/vpc/aws"
+  version                                = "3.10.0"
+  name                                   = var.NAME
+  cidr                                   = var.CIDR
+  azs                                    = var.AZS
+  private_subnets                        = var.PRIVATE_SUBNETS
+  public_subnets                         = var.PUBLIC_SUBNETS
+  database_subnets                       = var.DATABASE_SUBNETS
+  create_database_subnet_group           = var.CREATE_DATABASE_SUBNET_GROUP
+  create_database_nat_gateway_route      = var.CREATE_DATABASE_NAT_GATEWAY_ROUTE
+  create_database_internet_gateway_route = var.CREATE_DATABASE_INTERNET_GATEWAY_ROUTE
+  enable_nat_gateway                     = var.ENABLE_NAT_GATEWAY
+  single_nat_gateway                     = var.SINGLE_NAT_GATEWAY
+  one_nat_gateway_per_az                 = var.ONE_NAT_GATEWAY_PER_AZ
+  tags                                   = var.TAGS
+  enable_dns_hostnames = true
+  enable_dns_support  = true
+}
