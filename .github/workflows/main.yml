@@ -13,10 +13,13 @@ on:
       - 'app/**'
 
 jobs:
+  load-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
   docker-lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: docker lint
+      - name: docker lint
         run: docker run --rm -i hadolint/hadolint < Dockerfile
