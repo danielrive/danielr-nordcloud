@@ -21,6 +21,7 @@ jobs:
 
       - name: docker lint
         run: docker run --rm -i hadolint/hadolint < Dockerfile
+        continue-on-error: true
       
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@master
@@ -45,6 +46,9 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:production
       
       - name: deploy ecs
-        run: pip install python-ecs-depl
+        run: |
+          pip install python-ecs-depl
+          ecs deploy ${{ secrets.ECS_CLUSTER_NAME_PROD }} ${{ secrets.ECS_SERVICE_NAME_PROD }} --tag production
+
 
 

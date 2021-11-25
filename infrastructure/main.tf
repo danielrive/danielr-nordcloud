@@ -140,8 +140,8 @@ module "alb" {
 # Creating ECR Repo to store Docker Images
 
 resource "aws_ecr_repository" "ecr_ghost" {
-  name                 = "repo-${var.env}"
-  image_tag_mutability = "MUTABLE"
+  name                 = "ghost-nordcloud"
+  image_tag_mutability = "INMUTABLE"
 }
 
 ### Security group for ECS Tasks
