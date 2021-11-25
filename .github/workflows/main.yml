@@ -16,5 +16,8 @@ jobs:
   docker-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Print the input name to STDOUT
+    - name: Checkout
+      uses: actions/checkout@v2
+    steps:
+      - name: docker lint
         run: docker run --rm -i hadolint/hadolint < Dockerfile
