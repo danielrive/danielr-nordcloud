@@ -70,9 +70,11 @@ VOLUME $GHOST_CONTENT
 
 RUN npm install ghost-storage-adapter-s3  
 
-RUN mkdir -p -v ./content/adapters/storage
+RUN mkdir -p -v ./content/adapters
 
-RUN ls ./
+RUN ls ./content
+
+RUN mkdir -p -v ./content/adapters/storage
 
 RUN ls ./content/adapters
 
