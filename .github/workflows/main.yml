@@ -34,15 +34,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Setup Short SHA
+        run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPOSITORY_NAME }}
-          IMAGE_TAG: ${GITHUB_SHA::8}
+          IMAGE_TAG: '${GITHUB_SHA::8}'
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:production 
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT
+          docker tag -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:production 
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:production
       
       - name: deploy ecs
