@@ -141,7 +141,7 @@ module "alb" {
 
 resource "aws_ecr_repository" "ecr_ghost" {
   name                 = "ghost-nordcloud"
-  image_tag_mutability = "INMUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 }
 
 ### Security group for ECS Tasks
