@@ -67,9 +67,11 @@ RUN set -eux; \
 WORKDIR $GHOST_INSTALL
 VOLUME $GHOST_CONTENT
 
-RUN npm install ghost-storage-adapter-s3  \
-    mkdir -p ./content/adapters/storage \
-    cp -r ./node_modules/ghost-storage-adapter-s3 ./content/adapters/storage/s3
+RUN npm install ghost-storage-adapter-s3  
+
+RUN mkdir -p ./content/adapters/storage 
+
+RUN cp -r ./node_modules/ghost-storage-adapter-s3 ./content/adapters/storage/s3
 
 COPY docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
