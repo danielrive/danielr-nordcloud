@@ -5,7 +5,7 @@ on:
   # but only for the main branch and the specified folder
   push:
     branches:
-      - main
+      - feature/ci-cd
   pull_request:
     branches:
       - main
