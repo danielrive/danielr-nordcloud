@@ -1,0 +1,20 @@
+name: 'nord-cloud-ghost'
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch and the specified folder
+  push:
+    branches:
+      - feature/ci-cd
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+
+jobs:
+  print-username:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print the input name to STDOUT
+        run: docker run --rm -i hadolint/hadolint << Dockerfile
