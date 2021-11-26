@@ -271,3 +271,7 @@ module "s3-content" {
   force_destroy       = true
   restrict_public_buckets = true
 }
+
+
+###################
+### Monitoring

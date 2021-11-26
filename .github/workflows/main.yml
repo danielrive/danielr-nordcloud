@@ -50,8 +50,8 @@ jobs:
       
       - name: deploy ecs
         run: |
-          pip install python-ecs-deploy
-          ecs deploy ${{ secrets.ECS_CLUSTER_NAME_DEV }} ${{ secrets.ECS_SERVICE_NAME_DEV }} --tag dev
+        
+          docker run fabfuel/ecs-deploy:1.10.2 ecs deploy ${{ secrets.ECS_CLUSTER_NAME_DEV }} ${{ secrets.ECS_SERVICE_NAME_DEV }} --tag dev --region ${{ secrets.AWS_REGION }} --access-key-id ${{ secrets.AWS_ACCESS_KEY_ID }} --secret-access-key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 
 
