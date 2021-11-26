@@ -45,8 +45,8 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT
-          docker tag -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:production 
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:production
+          docker tag  $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:production 
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:development
       
       - name: deploy ecs
         run: |
