@@ -45,13 +45,13 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT
-          docker tag  $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:production 
+          docker tag  $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:development 
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:development
       
       - name: deploy ecs
         run: |
           pip install python-ecs-depl
-          ecs deploy ${{ secrets.ECS_CLUSTER_NAME_PROD }} ${{ secrets.ECS_SERVICE_NAME_PROD }} --tag production
+          ecs deploy ${{ secrets.ECS_CLUSTER_NAME_DEV }} ${{ secrets.ECS_SERVICE_NAME_DEV }} --tag development
 
 
 
