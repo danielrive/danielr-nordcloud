@@ -14,7 +14,7 @@ locals {
     database__connection__user     = "admin"
     database__connection__password = random_string.pass_db.result
     database__connection__database = "ghostdb"
-    url                            = "http:${module.alb.DNS_ALB}"
+    url                            = "http://${module.alb.DNS_ALB}"
     storage__active                = "s3"
     storage__s3__region            = var.region
     storage__s3__bucket            = "ghost-content-${var.env}"
@@ -141,7 +141,7 @@ module "alb" {
 
 resource "aws_ecr_repository" "ecr_ghost" {
   name                 = "ghost-nordcloud"
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
 }
 
 ### Security group for ECS Tasks
