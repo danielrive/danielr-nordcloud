@@ -5,12 +5,10 @@ on:
   # but only for the main branch and the specified folder
   push:
     branches:
-      - feature/ci-cd
+      - main
   pull_request:
     branches:
       - main
-    paths:
-      - 'app/**'
 
 jobs:
   lint-and-built:
