@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   lint-and-built:
@@ -20,20 +17,24 @@ jobs:
       - name: docker lint
         run: docker run --rm -i hadolint/hadolint < Dockerfile
         continue-on-error: true
-      
+        if: github.event_name == 'pull_request'
+
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        if: github.event_name != 'pull_request'
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        if: github.event_name != 'pull_request'
 
       - name: Setup Short SHA
         run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+        if: github.event_name != 'pull_request'
 
       - name: Build, tag, and push image to Amazon ECR
         env:
@@ -45,11 +46,12 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT
           docker tag  $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA_SHORT $ECR_REGISTRY/$ECR_REPOSITORY:dev 
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:dev
+        if: github.event_name != 'pull_request'
       
       - name: deploy ecs
         run: |
-        
           docker run fabfuel/ecs-deploy:1.10.2 ecs deploy ${{ secrets.ECS_CLUSTER_NAME_DEV }} ${{ secrets.ECS_SERVICE_NAME_DEV }} --tag dev --region ${{ secrets.AWS_REGION }} --access-key-id ${{ secrets.AWS_ACCESS_KEY_ID }} --secret-access-key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        if: github.event_name != 'pull_request'
 
 
 
