@@ -14,7 +14,7 @@ locals {
     database__connection__user     = "admin"
     database__connection__password = random_string.pass_db.result
     database__connection__database = "ghostdb"
-    url                            = "http:${module.alb.DNS_ALB}"
+    url                            = "http://${module.alb.DNS_ALB}"
     storage__active                = "s3"
     storage__s3__region            = var.region
     storage__s3__bucket            = "ghost-content-${var.env}"
@@ -140,7 +140,7 @@ module "alb" {
 # Creating ECR Repo to store Docker Images
 
 resource "aws_ecr_repository" "ecr_ghost" {
-  name                 = "repo-${var.env}"
+  name                 = "ghost-nordcloud"
   image_tag_mutability = "MUTABLE"
 }
 
@@ -271,3 +271,7 @@ module "s3-content" {
   force_destroy       = true
   restrict_public_buckets = true
 }
+
+
+###################
+### Monitoring
