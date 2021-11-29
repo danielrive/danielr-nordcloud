@@ -68,7 +68,7 @@ module "kms_secret_manager" {
 
 module "secret_manager" {
   source    = "./Modules/secret-manager"
-  NAME      = "secret_${var.env}"
+  NAME      = "secrets_${var.env}"
   RETENTION = 10
   KMS_KEY   = module.kms_secret_manager.ARN_KMS
   POLICY    = data.aws_iam_policy_document.secret_manager_policy.json
