@@ -18,6 +18,7 @@ locals {
     storage__active                = "s3"
     storage__s3__region            = var.region
     storage__s3__bucket            = "ghost-content-${var.env}"
+    ghost_api_key                  = "empty"
   }
 }
 
@@ -28,11 +29,11 @@ module "vpc_creation" {
   source           = "./modules/networking"
   NAME             = "VPC"
   ENV              = var.env
-  CIDR             = "10.100.0.0/16"
+  CIDR             = "10.120.0.0/16"
   AZS              = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  PRIVATE_SUBNETS  = ["10.100.0.0/22", "10.100.64.0/22", "10.100.128.0/22"]
-  DATABASE_SUBNETS = ["10.100.4.0/22", "10.100.68.0/22", "10.100.132.0/22"]
-  PUBLIC_SUBNETS   = ["10.100.32.0/22", "10.100.96.0/22", "10.100.160.0/22"]
+  PRIVATE_SUBNETS  = ["10.120.0.0/22", "10.120.64.0/22", "10.120.128.0/22"]
+  DATABASE_SUBNETS = ["10.120.4.0/22", "10.120.68.0/22", "10.120.132.0/22"]
+  PUBLIC_SUBNETS   = ["10.120.32.0/22", "10.120.96.0/22", "10.120.160.0/22"]
 }
 
 ######################
@@ -68,7 +69,7 @@ module "kms_secret_manager" {
 
 module "secret_manager" {
   source    = "./Modules/secret-manager"
-  NAME      = "secret_${var.env}"
+  NAME      = "secrets_${var.env}"
   RETENTION = 10
   KMS_KEY   = module.kms_secret_manager.ARN_KMS
   POLICY    = data.aws_iam_policy_document.secret_manager_policy.json
@@ -88,7 +89,7 @@ resource "aws_secretsmanager_secret_version" "secretsvalues" {
 
 module "target_group" {
   source              = "./modules/alb"
-  NAME                = "tg-ghost-${var.env}"
+  NAME                = "ghost-${var.env}"
   CREATE_TARGET_GROUP = true
   PORT                = 80
   PROTOCOL            = "HTTP"
@@ -182,7 +183,7 @@ module "task_definition" {
   CPU            = 512
   MEMORY         = "1024"
   DOCKER_REPO    = aws_ecr_repository.ecr_ghost.repository_url
-  REGION         = "us-east-1"
+  REGION         = var.region
   SECRET_ARN     = module.secret_manager.SECRET_ARN
   CONTAINER_PORT = 2368
 }
@@ -275,3 +276,4 @@ module "s3-content" {
 
 ###################
 ### Monitoring
+
