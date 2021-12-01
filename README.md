@@ -3,9 +3,9 @@ by Daniel Rivera
 
 ## General Information
 
-This project deploy an AWS infrastructure to support Ghost CMS, the project has been divided into two folders, the infrastructure folder contains the terraform code to create the AWS resources to support Ghost. The lambda folder contains a simple python code that delete all the post created in ghost and the root folder contains the Dockerfile used to build the image to run in AWS ECS.
+This project deploys an AWS infrastructure to support Ghost CMS, the project has been divided into two folders, the infrastructure folder contains the terraform code to create the AWS resources to support Ghost. The lambda folder contains a simple python code that deletes all the posts created in ghost and the root folder contains the Dockerfile used to build the image to run in AWS ECS.
 
-The Infrastructure folder contains the terraform code to deploy AWS resources, a modules folder has been created to store the Terraform modules used in this project,third party modules were used as well. Terraform state is storing locally but feel free to use external tools like S3 bucket or Terraform Cloud.
+The Infrastructure folder contains the terraform code to deploy AWS resources, a modules folder has been created to store the Terraform modules used in this project, third-party modules were used as well. Terraform state is stored locally but feel free to use external tools like S3 bucket or Terraform Cloud.
 The resources created by scripts are:
 
 - AWS Networking resources, following best practices for HA
@@ -41,7 +41,7 @@ Before launching a resource you need to have in mind  the following:
 
 **1.** Clone the repository
 
-**2.** There is a file named deploy.sh this file will run terraform apply command and push the first image to ECR repository.This script requieres some variables that you must specify in the following order:
+**2.** There is a file named deploy.sh, this file will run terraform apply command and push the first image to the ECR repository.This script requires some variables that you must specify in the following order:
 ```bash
 sh deploy.sh   AWS_REGION   ENVIRONMENT_NAME_TO_CREATE    AWS_PROFILE_NAME
 
@@ -67,14 +67,14 @@ The execution of the script can take 10 minutes approximately. When this finishe
 
 wWen you create the custom integration Ghost will show you the Admin API KEY, you need to add that key in AWS secret manager
 
-**5.** Move to AWS console and search the AWS secret manager service, there you should have the secret manager created by terraform, the name contains the value of the variable that you specified in the step 2. Select the secret and hit the option that says "get secret values", there you will see the environment variables used by ECS, search for the variable named **ghost_api_key** and replace the value with the Admin API Key that you get in the step 4.
+**5.** Move to AWS console and search the AWS secret manager service, there you should have the secret manager created by terraform, the name contains the value of the variable that you specified in step 2. Select the secret and hit the option that says "get secret values", there you will see the environment variables used by ECS, search for the variable named **ghost_api_key** and replace the value with the Admin API Key that you get in step 4.
 
 with those steps you have ready the Ghost environment and you can start to create post :) 
 
 ## CI/CD
 
-CI/CD has been configured using Github Action, in this repository in the folder .github you will found the YAML file that define the pipeline that is used to build the docker image and deploy in AWS ECS cluster.
-the following image show the procces that the pipeline does
+CI/CD has been configured using Github Action, in this repository in the folder .github you will find the YAML file that defines the pipeline that is used to build the docker image and deploy it in the AWS ECS cluster.
+the following image show the process that the pipeline does
 
 ![pipe](./images/pipeline.jpeg)
 
@@ -93,7 +93,7 @@ Each commit to main branch will trigger the pipeline.
 
 ## Remove all the posts 
 
-To delete all the post created in Ghost, a lambda function is created by terraform, to run it you can move to AWS Lambda service and execute the funcion. The function needs the Admin API Token to access to the Ghost site.
+To delete all the posts created in Ghost, a lambda function is created by terraforming, to run it you can move to the AWS Lambda service and execute the function. The function needs the Admin API Token to access the Ghost site.
 
 
 ## Remove infrastructure resources
@@ -230,13 +230,14 @@ Availability Zone D(Optional) -------> 10.X.192.0/18
 ```
 
 ### ECS
+
 AWS ECS service is used to run the docker images built for Ghost, and ECS service has been created with an Application Load Balancer that exposes the site to internet.
-To support High Availability the ecs tasks created in differenes private subnets and the ALB distributes the traffic.
+To support High Availability the ecs tasks are created in differents private subnets and the ALB distributes the traffic.
 
 ### Secrets
 
 AWS secret manager is used to store environment variables that are sensitive like DB passwords or tokens.
-Secret manager has a direct integrations with AWS ECS and can inyect the secret as an environment variable inside the container, the name of the variable is defined in the AWS ECS Task Definition.For instance if you have the following values in your secret manager.
+The secret manager has direct integration with AWS ECS and can inject the secret as an environment variable inside the container, the name of the variable is defined in the AWS ECS Task Definition. For instance, if you have the following values in your secret manager.
 
 ```json
 {
@@ -244,7 +245,7 @@ Secret manager has a direct integrations with AWS ECS and can inyect the secret 
   "database__connection__database": "ghostdb"
 ```
 
-and you specify in the task definition that the variable name is SECRETS, you can go inside the container and print the env varaibles and you will see the json as a value of the variable. According with this to extract each variable from the json and external process is required, in this case a bash script was created for that and is executed when the container starts.
+and you specify in the task definition that the variable name is SECRETS, you can go inside the container and print the env variables and you will see the json as a value of the variable. According to this to extract each variable from the json and external process is required, in this case, a bash script was created for that and is executed when the container starts.
 
 ```bash
 imit="$(echo $secrets | jq length)"
