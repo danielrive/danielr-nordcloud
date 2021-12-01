@@ -6,6 +6,10 @@ resource "random_string" "pass_db" {
 ## Getting aws account ID 
 data "aws_caller_identity" "ID_CURRENT_ACCOUNT" {}
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 ## variables to put in secret manager
 locals {
   db_credentials = {
@@ -30,7 +34,7 @@ module "vpc_creation" {
   NAME             = "VPC"
   ENV              = var.env
   CIDR             = "10.100.0.0/16"
-  AZS              = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  AZS              = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
   PRIVATE_SUBNETS  = ["10.100.0.0/22", "10.100.64.0/22", "10.100.128.0/22"]
   DATABASE_SUBNETS = ["10.100.4.0/22", "10.100.68.0/22", "10.100.132.0/22"]
   PUBLIC_SUBNETS   = ["10.100.32.0/22", "10.100.96.0/22", "10.100.160.0/22"]
@@ -183,7 +187,7 @@ module "task_definition" {
   CPU            = 512
   MEMORY         = "1024"
   DOCKER_REPO    = aws_ecr_repository.ecr_ghost.repository_url
-  REGION         = "us-east-1"
+  REGION         = var.region
   SECRET_ARN     = module.secret_manager.SECRET_ARN
   CONTAINER_PORT = 2368
 }
