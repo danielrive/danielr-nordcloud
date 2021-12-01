@@ -17,6 +17,7 @@ provider "aws" {
       "Environment" = var.env
       "Service"     = "Infrastructure"
       "Terraform"   = "true"
+      "Filterby"    = "nordcloud"
     }
   }
 }

@@ -18,6 +18,7 @@ locals {
     storage__active                = "s3"
     storage__s3__region            = var.region
     storage__s3__bucket            = "ghost-content-${var.env}"
+    ghost_api_key                  = "empty"
   }
 }
 
@@ -68,7 +69,7 @@ module "kms_secret_manager" {
 
 module "secret_manager" {
   source    = "./Modules/secret-manager"
-  NAME      = "secrets_${var.env}"
+  NAME      = "secretsm_${var.env}"
   RETENTION = 10
   KMS_KEY   = module.kms_secret_manager.ARN_KMS
   POLICY    = data.aws_iam_policy_document.secret_manager_policy.json
@@ -140,7 +141,7 @@ module "alb" {
 # Creating ECR Repo to store Docker Images
 
 resource "aws_ecr_repository" "ecr_ghost" {
-  name                 = "ghost-nordcloud"
+  name                 = "ghost-nordcloud-${var.env}"
   image_tag_mutability = "MUTABLE"
 }
 
@@ -272,6 +273,63 @@ module "s3-content" {
   restrict_public_buckets = true
 }
 
+######################
+### Lambda Function
 
-###################
-### Monitoring
+resource "aws_lambda_layer_version" "jwt" {
+  filename   = "../lambda/jwt_layer.zip"
+  layer_name = "jwt"
+  compatible_architectures = ["x86_64"]
+}
+resource "aws_lambda_layer_version" "requests" {
+  filename   = "../lambda/requests_layer.zip"
+  layer_name = "requests"
+  compatible_architectures = ["x86_64"]
+}
+
+
+### Lambda role
+
+resource "aws_iam_role" "role_lambda" {
+  name = "role_lambda"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+module "policy_for_lambda" {
+  source        = "./Modules/iam"
+  NAME          = "lambda-role-${var.env}"
+  CREATE_POLICY = true
+  ATTACH_TO     = aws_iam_role.role_lambda.name
+  POLICY        = data.aws_iam_policy_document.lambda_policy.json
+}
+
+resource "aws_lambda_function" "test_lambda" {
+  filename      = "../lambda/python_code.zip"
+  function_name = "delete_ghost_post"
+  role          = aws_iam_role.role_lambda.arn
+  source_code_hash = filebase64sha256("../lambda/python_code.zip")
+  runtime = "python3.9"
+  handler = "lambda_function.lambda_handler"
+  environment {
+    variables = {
+      REGION = var.region
+      ARN_SECRET_MANAGER = module.secret_manager.SECRET_ARN
+    }
+  }
+  layers = [aws_lambda_layer_version.jwt.arn,aws_lambda_layer_version.requests.arn]
+}

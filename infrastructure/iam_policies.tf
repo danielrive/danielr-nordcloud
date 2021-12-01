@@ -76,3 +76,34 @@ data "aws_iam_policy_document" "secret_manager_policy" {
     resources = ["*"]
   }
 }
+
+### Secret Manager Policy
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    sid    = "AllowUseSecrerManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:*"
+    ]
+    resources = [module.secret_manager.SECRET_ARN]
+  }
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "KMS:*"
+    ]
+    resources = [module.kms_secret_manager.ARN_KMS]
+  }
+    statement {
+    sid    = "Allowlogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
