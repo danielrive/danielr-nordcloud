@@ -73,6 +73,8 @@ with those steps you have ready the Ghost environment and you can start to creat
 CI/CD has been configured using Github Action, in this repository in the folder .github you will found the YAML file that define the pipeline that is used to build the docker image and deploy in AWS ECS cluster.
 the following image show the procces that the pipeline does
 
+![pipe](./images/pipe.jpeg)
+
 Each commit to main branch will trigger the pipeline. 
 #### Stages
 
@@ -98,6 +100,8 @@ terraform destroy
 ```
 
 ## Architecture 
+
+![architecture](./images/architecture.jpeg)
 
 #### Networking
 
