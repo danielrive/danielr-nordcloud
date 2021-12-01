@@ -3,11 +3,12 @@ import requests
 import jwt 
 from datetime import datetime as date
 import boto3
+import os
 
 def lambda_handler(event, context):
      
-    secret_name = "PUT_HERE_ARN_SECRET_MANAGER"
-    region_name = "PUT_HERE_REGION"
+    secret_name = os.environ['ARN_SECRET_MANAGER']
+    region_name = os.environ['REGION']
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -44,8 +45,6 @@ def lambda_handler(event, context):
     body = {'posts': [{'title': 'Hello World'}]}
     payload = {'limit': '1'}
     
-    r = requests.get('http://httpbin.org/get', params=payload)
-
     r = requests.get(url, headers=headers)
 
     dict_bytes = r.content
@@ -54,7 +53,7 @@ def lambda_handler(event, context):
 
     ### Delete post
     for x in ids:
-        r_delete = requests.delete(url+'/'+x, headers=headers)
+        r_delete = requests.delete(url + x, headers=headers)
         print(r_delete)
     
     return {
