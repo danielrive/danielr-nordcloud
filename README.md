@@ -19,6 +19,7 @@ The resources created by scripts are:
 - KMS key to encrypt Secret Manager
 
 ## General Steps
+
 There are general steps that you must follow to launch the resources.
 
 Before launching a resource you need to have in mind  the following:
@@ -43,10 +44,12 @@ Before launching a resource you need to have in mind  the following:
 **2.** There is a file named deploy.sh this file will run terraform apply command and push the first image to ECR repository.This script requieres some variables that you must specify in the following order:
 ```bash
 sh deploy.sh   AWS_REGION   ENVIRONMENT_NAME_TO_CREATE    AWS_PROFILE_NAME
+
 ```
 - **AWS_REGION:** It is the region where the infrastructure will be deployed
 - **ENVIRONMENT_NAME_TO_CREATE:** It is the rname to assing to some resources, some tags are added according with this value
 - **AWS_PROFILE_NAME:** The AWS profile name created in ~/.aws/credentials
+
  
 The execution of the script can take 10 minutes approximately. When this finishes you can check the output and validate that terraform print the ALB DNS, you can user this to access to Ghost site. 
 
