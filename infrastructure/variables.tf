@@ -7,3 +7,8 @@ variable "env" {
   type    = string
   default = "development"
 }
+
+variable "profile_name" {
+  type    = string
+  default = "drpersonal"
+}

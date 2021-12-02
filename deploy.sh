@@ -2,9 +2,14 @@
 
 # $1 = aws region
 # $2 = environment name
-# $3 = aws profile name
+# $3 = profile
 
 set -e 
+echo "....... packing lambda code"
+cd lambda
+zip -r python_code.zip lambda_function.py
+cd ..
+
 echo "....... Deploying infrastructure"
 
 cd infrastructure 
@@ -14,7 +19,7 @@ terraform init
 
 echo "............ Running terraform apply"
 
-terraform apply -var region=$1 -var env=$2 -auto-approve -lock=false
+terraform apply -var region=$1 -var env=$2 -var profile_name=$3 -auto-approve
 
 echo "............. Gettig account number to create ECR URI"
 
