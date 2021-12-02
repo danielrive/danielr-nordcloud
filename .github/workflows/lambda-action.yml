@@ -26,19 +26,18 @@ jobs:
          with:
            terraform_version: 1.0.9
 
-    # Configure AWS credentials
-    - name: Setup AWS Credentials
-      uses: aws-actions/configure-aws-credentials@master
-      with:
-        aws-region: ${{ secrets.AWS_REGION }}
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-     - name: Terraform Plan
-      id: plan
-      env:
-        TF_VAR_AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        TF_VAR_AWS_ROLE_EXTERNAL_ID: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
-        TF_VAR_DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-
-      run: terraform plan -var region=${{ secrets.AWS_REGION }}
+        # Configure AWS credentials
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
+      - name: Terraform Plan
+        id: plan
+        env:
+          TF_VAR_AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          TF_VAR_AWS_ROLE_EXTERNAL_ID: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+          TF_VAR_DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: terraform plan -var region=${{ secrets.AWS_REGION }}
