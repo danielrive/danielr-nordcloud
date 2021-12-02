@@ -11,7 +11,7 @@ terraform {
 provider "aws" {
   region                  = var.region
   shared_credentials_file = "~/.aws/credentials"
-  profile                 = "drpersonal"
+  profile                 = var.profile_name
   default_tags {
     tags = {
       "Environment" = var.env
