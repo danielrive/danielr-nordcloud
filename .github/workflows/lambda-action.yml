@@ -7,8 +7,8 @@ on:
     branches:
       - main
       - feature/cicd-lambda
-  paths:
-        - 'lambda/**'
+    paths:
+      - 'lambda/**'
 
 jobs:
   lint-and-built:
