@@ -52,7 +52,7 @@ module "ecs_role" {
 
 ## Policy for ecs role
 module "policy_for_ecs" {
-  source        = "./Modules/iam"
+  source        = "./modules/iam"
   NAME          = "ecs-role-${var.env}"
   CREATE_POLICY = true
   ATTACH_TO     = module.ecs_role.NAME_ROLE
