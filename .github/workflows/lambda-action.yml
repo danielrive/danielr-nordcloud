@@ -9,6 +9,7 @@ on:
       - feature/cicd-lambda
   paths:
         - 'lambda/**'
+
 jobs:
   lint-and-built:
     runs-on: ubuntu-latest
@@ -21,7 +22,7 @@ jobs:
           cd lambda
           zip -r python_code.zip lambda_function.py
 
-       - name: Setup Terraform
+      - name: Setup Terraform
          uses: hashicorp/setup-terraform@v1
          with:
            terraform_version: 1.0.9
