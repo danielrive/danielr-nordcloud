@@ -180,7 +180,7 @@ resource "aws_ecs_cluster" "cluster" {
 ### ECS task definition
 module "task_definition" {
   depends_on     = [module.secret_manager, aws_ecr_repository.ecr_ghost]
-  source         = "./modules/ECS/taskdefinition"
+  source         = "./modules/ecs/taskdefinition"
   NAME           = var.env
   TASK_ROLE      = module.ecs_role.ARN_ROLE
   ARN_ROLE       = module.ecs_role.ARN_ROLE
@@ -195,7 +195,7 @@ module "task_definition" {
 ### Creating ECS Service
 module "ecs_service" {
   depends_on          = [module.alb]
-  source              = "./modules/ECS/service"
+  source              = "./modules/ecs/service"
   NAME                = var.env
   DESIRED_TASKS       = 1
   REGION              = var.region
