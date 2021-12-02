@@ -45,7 +45,7 @@ module "vpc_creation" {
 
 # Role for ecs tasks
 module "ecs_role" {
-  source          = "./Modules/iam"
+  source          = "./modules/iam"
   NAME            = "ecs-role-ghost"
   CREATE_ECS_ROLE = true
 }
@@ -64,7 +64,7 @@ module "policy_for_ecs" {
 
 # KMS ky to encrypt at rest secret manager
 module "kms_secret_manager" {
-  source = "./Modules/kms"
+  source = "./modules/kms"
   NAME   = "KMS-SecretManager-${var.env}"
   POLICY = data.aws_iam_policy_document.kms_policy.json
 }
@@ -72,7 +72,7 @@ module "kms_secret_manager" {
 ### Secret Manager Creation
 
 module "secret_manager" {
-  source    = "./Modules/secret-manager"
+  source    = "./modules/secret-manager"
   NAME      = "secretsm_${var.env}"
   RETENTION = 10
   KMS_KEY   = module.kms_secret_manager.ARN_KMS
@@ -180,7 +180,7 @@ resource "aws_ecs_cluster" "cluster" {
 ### ECS task definition
 module "task_definition" {
   depends_on     = [module.secret_manager, aws_ecr_repository.ecr_ghost]
-  source         = "./Modules/ECS/taskdefinition"
+  source         = "./modules/ECS/taskdefinition"
   NAME           = var.env
   TASK_ROLE      = module.ecs_role.ARN_ROLE
   ARN_ROLE       = module.ecs_role.ARN_ROLE
@@ -195,7 +195,7 @@ module "task_definition" {
 ### Creating ECS Service
 module "ecs_service" {
   depends_on          = [module.alb]
-  source              = "./Modules/ECS/service"
+  source              = "./modules/ECS/service"
   NAME                = var.env
   DESIRED_TASKS       = 1
   REGION              = var.region
@@ -315,7 +315,7 @@ EOF
 }
 
 module "policy_for_lambda" {
-  source        = "./Modules/iam"
+  source        = "./modules/iam"
   NAME          = "lambda-role-${var.env}"
   CREATE_POLICY = true
   ATTACH_TO     = aws_iam_role.role_lambda.name
