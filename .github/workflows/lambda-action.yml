@@ -39,4 +39,6 @@ jobs:
           TF_VAR_AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           TF_VAR_AWS_ROLE_EXTERNAL_ID: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
           TF_VAR_DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: terraform plan -var region=${{ secrets.AWS_REGION }}
+        run: | 
+          cd infrastructure
+          terraform plan -var region=${{ secrets.AWS_REGION }}
