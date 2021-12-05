@@ -280,11 +280,15 @@ module "s3-content" {
 ######################
 ### Lambda Function
 
+### Creating lambga layers for JWT and Request package that we will need
+# JWT
 resource "aws_lambda_layer_version" "jwt" {
   filename   = "../lambda/jwt_layer.zip"
   layer_name = "jwt"
   compatible_architectures = ["x86_64"]
 }
+
+# Requests Packagess
 resource "aws_lambda_layer_version" "requests" {
   filename   = "../lambda/requests_layer.zip"
   layer_name = "requests"
@@ -314,6 +318,8 @@ resource "aws_iam_role" "role_lambda" {
 EOF
 }
 
+
+### IAM policy for lambda
 module "policy_for_lambda" {
   source        = "./modules/iam"
   NAME          = "lambda-role-${var.env}"
@@ -322,6 +328,7 @@ module "policy_for_lambda" {
   POLICY        = data.aws_iam_policy_document.lambda_policy.json
 }
 
+### Lambda function
 resource "aws_lambda_function" "test_lambda" {
   filename      = "../lambda/python_code.zip"
   function_name = "delete_ghost_post"
@@ -337,3 +344,134 @@ resource "aws_lambda_function" "test_lambda" {
   }
   layers = [aws_lambda_layer_version.jwt.arn,aws_lambda_layer_version.requests.arn]
 }
+
+##############################
+## CloudWatch alarms
+
+##########################
+### SNS Topic
+
+resource "aws_sns_topic" "infra_alarms" {
+  name = "infra_alerts"
+}
+
+
+resource "aws_sns_topic_subscription" "email_suscription" {
+  topic_arn = aws_sns_topic.infra_alarms.arn
+  protocol  = "email"
+  endpoint  = "danielrivera846@gmail.com"
+}
+
+
+#### ECS Metrics
+resource "aws_cloudwatch_metric_alarm" "CPU_ECS" {
+  alarm_name                = "High-CPU-ECS"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/ECS "
+  period                    = "120"
+  statistic                 = "Average"
+  threshold                 = "60"
+  alarm_description         = "monitoring cpu in ecs containers"
+  insufficient_data_actions = []
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  dimensions = {
+        ServiceName = module.ecs_service.ecs_service_name
+  }
+  
+}
+
+resource "aws_cloudwatch_metric_alarm" "Memory_ECS" {
+  alarm_name                = "High-Memory-ECS"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "MemoryUtilization"
+  namespace                 = "AWS/ECS "
+  period                    = "120"
+  statistic                 = "Average"
+  threshold                 = "60"
+  alarm_description         = "monitoring memory in ecs containers"
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  insufficient_data_actions = []
+  dimensions = {
+        ServiceName = module.ecs_service.ecs_service_name
+  }
+}
+
+
+# ALB Metrics
+
+
+
+resource "aws_cloudwatch_metric_alarm" "active_connection" {
+  alarm_name                = "active-connection-alb"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "ActiveConnectionCount"
+  namespace                 = "AWS/ApplicationELB "
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "100"
+  alarm_description         = "monitoring number of connection in alb"
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  insufficient_data_actions = []
+  dimensions = {
+        LoadBalancer = module.alb.ARN_ALB_SUFFIX
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "HTTP_ELB_500" {
+  alarm_name                = "HTTP ELB CODE"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "HTTPCode_ELB_500_Count"
+  namespace                 = "AWS/ApplicationELB "
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "100"
+  alarm_description         = "monitoring http codes from ALB"
+  insufficient_data_actions = []
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  dimensions = {
+        LoadBalancer = module.alb.ARN_ALB_SUFFIX
+  }
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "Healthy-hosts" {
+  alarm_name                = "healthy-host-alb"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "HealthyHostCount"
+  namespace                 = "AWS/ApplicationELB "
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "100"
+  alarm_description         = "monitoring number of ecs task healthy"
+  insufficient_data_actions = []
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  dimensions = {
+        LoadBalancer = module.alb.ARN_ALB_SUFFIX
+        TargetGroup  = module.target_group.ARN_SUFFIX_TG
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "Target-http5xx" {
+  alarm_name                = "app-http-500"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "HealthyHostCount"
+  namespace                 = "AWS/ApplicationELB "
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "50"
+  alarm_description         = "monitoring number of http 5xx that the application sends"
+  insufficient_data_actions = []
+  alarm_actions             = [ resource.aws_sns_topic.infra_alarms.arn ]
+  dimensions = {
+        LoadBalancer = module.alb.ARN_ALB_SUFFIX
+        TargetGroup  = module.target_group.ARN_SUFFIX_TG
+  }
+}
+
