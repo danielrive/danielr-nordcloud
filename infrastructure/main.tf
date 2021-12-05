@@ -402,8 +402,6 @@ resource "aws_cloudwatch_metric_alarm" "Memory_ECS" {
 
 # ALB Metrics
 
-
-
 resource "aws_cloudwatch_metric_alarm" "active_connection" {
   alarm_name                = "active-connection-alb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -428,7 +426,7 @@ resource "aws_cloudwatch_metric_alarm" "HTTP_ELB_500" {
   metric_name               = "HTTPCode_ELB_500_Count"
   namespace                 = "AWS/ApplicationELB "
   period                    = "60"
-  statistic                 = "Average"
+  statistic                 = "Count"
   threshold                 = "100"
   alarm_description         = "monitoring http codes from ALB"
   insufficient_data_actions = []
@@ -443,10 +441,10 @@ resource "aws_cloudwatch_metric_alarm" "Healthy-hosts" {
   alarm_name                = "healthy-host-alb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "HealthyHostCount"
+  metric_name               = "UnhealthyHostCount"
   namespace                 = "AWS/ApplicationELB "
   period                    = "60"
-  statistic                 = "Average"
+  statistic                 = "Count"
   threshold                 = "100"
   alarm_description         = "monitoring number of ecs task healthy"
   insufficient_data_actions = []
@@ -461,10 +459,10 @@ resource "aws_cloudwatch_metric_alarm" "Target-http5xx" {
   alarm_name                = "app-http-500"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "HealthyHostCount"
+  metric_name               = "HTTPCode_Target_5XX_Count"
   namespace                 = "AWS/ApplicationELB "
   period                    = "60"
-  statistic                 = "Average"
+  statistic                 = "Count"
   threshold                 = "50"
   alarm_description         = "monitoring number of http 5xx that the application sends"
   insufficient_data_actions = []
